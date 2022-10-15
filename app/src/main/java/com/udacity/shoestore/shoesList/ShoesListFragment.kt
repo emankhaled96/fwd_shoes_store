@@ -1,11 +1,12 @@
 package com.udacity.shoestore.shoesList
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.onNavDestinationSelected
 import com.udacity.shoestore.R
 import com.udacity.shoestore.databinding.FragmentShoesListBinding
 
@@ -23,6 +24,7 @@ class ShoesListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentShoesListBinding.inflate(LayoutInflater.from(context), container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -36,4 +38,12 @@ class ShoesListFragment : Fragment() {
             findNavController().navigate(ShoesListFragmentDirections.actionShoesListFragmentToAddShoesFragment())
         }
     }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.main_menu , menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return item.onNavDestinationSelected(requireView().findNavController())
+                || super.onOptionsItemSelected(item)    }
+
 }
