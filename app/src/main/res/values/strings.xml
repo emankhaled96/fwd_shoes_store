@@ -20,5 +20,7 @@
     <string name="shoes_size">Shoes Size</string>
     <string name="Add_shoes">Add Shoes</string>
     <string name="logout">Logout</string>
+    <string name="cancel">Cancel</string>
+    <string name="shoes_image_link">Image Link</string>
 
 </resources>
