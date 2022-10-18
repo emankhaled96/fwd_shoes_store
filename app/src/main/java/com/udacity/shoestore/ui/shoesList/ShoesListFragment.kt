@@ -34,6 +34,7 @@ class ShoesListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+
         binding = FragmentShoesListBinding.inflate(LayoutInflater.from(context), container, false)
         viewModel = ViewModelProvider(requireActivity()).get(ShoesViewModel::class.java)
         setHasOptionsMenu(true)
@@ -63,7 +64,6 @@ class ShoesListFragment : Fragment() {
             val linearLayoutVertical = LinearLayout(context).apply {
                 layoutParams = layoutParams1
                 orientation = LinearLayout.VERTICAL
-//                setPadding(10, 5, 10, 5)
                 layoutParams1.setMargins(10, 10, 10, 10)
 
             }
@@ -71,7 +71,6 @@ class ShoesListFragment : Fragment() {
                 layoutParams = layoutParams1
                 orientation = LinearLayout.HORIZONTAL
                 layoutParams1.setMargins(25, 10, 10, 10)
-//                setPadding(10, 5, 10, 5)
 
 
             }
@@ -105,7 +104,7 @@ class ShoesListFragment : Fragment() {
 
 
             }
-            Picasso.get().load(shoe.images.get(0)).into(shoeImage)
+            Picasso.get().load(shoe.images[0]).into(shoeImage)
             linearLayoutHorizontal.addView(shoeImage)
             linearLayoutHorizontal.addView(linearLayoutVertical)
             linearLayoutVertical.addView(shoeName)

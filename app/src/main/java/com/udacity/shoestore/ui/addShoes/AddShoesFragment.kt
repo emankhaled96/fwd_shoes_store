@@ -1,6 +1,7 @@
 package com.udacity.shoestore.ui.addShoes
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.udacity.shoestore.ShoesViewModel
 import com.udacity.shoestore.databinding.FragmentAddShoesBinding
+import kotlinx.android.synthetic.main.fragment_add_shoes.*
+import timber.log.Timber
 
 class AddShoesFragment : Fragment() {
     private lateinit var binding: FragmentAddShoesBinding
@@ -22,44 +25,45 @@ class AddShoesFragment : Fragment() {
     ): View? {
         binding = FragmentAddShoesBinding.inflate(LayoutInflater.from(context), container, false)
         viewModel = ViewModelProvider(requireActivity()).get(ShoesViewModel::class.java)
-
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = activity
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpListeners()
+        setUpObservers()
     }
 
-    private fun setUpListeners() {
-        binding.shoesNameEdit.doAfterTextChanged {
+    private fun setUpObservers() {
+        viewModel.shoeAdded.observe(viewLifecycleOwner) { shoeAdded ->
+            if (shoeAdded) {
+                navigateBack()
+                viewModel.setBackShoeAdded(false)
 
-            viewModel.setShoeName(it.toString())
+            }
+
         }
-        binding.shoesSizeEdit.doAfterTextChanged {
-            viewModel.setShoeSize(it.toString().toDouble())
+
+        viewModel.cancelClicked.observe(viewLifecycleOwner){cancel->
+            if(cancel){
+                navigateBack()
+                viewModel.setBackCancel(false)
+            }
+
         }
-        binding.companyNameEdit.doAfterTextChanged {
-            viewModel.setShoeCompany(it.toString())
-        }
-        binding.shoesDescriptionEdit.doAfterTextChanged {
-            viewModel.setShoeDescription(it.toString())
-        }
-        binding.shoesImageLinkEdit.doAfterTextChanged {
-            viewModel.setShoeImgLink(it.toString())
-        }
-        binding.addBtn.setOnClickListener {
-            if (viewModel.validateForm()) {
-                viewModel.addShoe()
-                findNavController().navigate(AddShoesFragmentDirections.actionAddShoesFragmentToShoesListFragment())
-            } else {
+        viewModel.formValidity.observe(viewLifecycleOwner){ formValid->
+            if(!formValid)
                 Toast.makeText(context, "Please Complete The Shoes Information", Toast.LENGTH_SHORT)
                     .show()
-            }
         }
-        binding.cancelBtn.setOnClickListener {
-            findNavController().navigate(AddShoesFragmentDirections.actionAddShoesFragmentToShoesListFragment())
-        }
+    }
+
+
+
+    private fun navigateBack() {
+        findNavController().navigate(AddShoesFragmentDirections.actionAddShoesFragmentToShoesListFragment())
+
     }
 
 

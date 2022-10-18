@@ -1,12 +1,9 @@
 package com.udacity.shoestore
 
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.udacity.shoestore.models.Shoe
-import timber.log.Timber
 
 class ShoesViewModel : ViewModel() {
 
@@ -14,35 +11,38 @@ class ShoesViewModel : ViewModel() {
     val shoeList: LiveData<MutableList<Shoe>>
         get() = _shoesList
 
-    private val _addedShoe = MutableLiveData<Shoe>()
-    val addedShoe: LiveData<Shoe>
-        get() = _addedShoe
+    private val _addedShoe = MutableLiveData<Shoe?>()
 
-    private val _addedShoeName = MutableLiveData<String?>()
-    val addedShoeName: LiveData<String?>
-        get() = _addedShoeName
+    val addedShoeName = MutableLiveData<String?>()
 
-    private val _addedShoeSize = MutableLiveData<Double?>()
-    val addedShoeSize: LiveData<Double?>
-        get() = _addedShoeSize
+    val addedShoeSize = MutableLiveData<String?>()
 
-    private val _addedShoeDescription = MutableLiveData<String?>()
-    val addedShoeDescription: LiveData<String?>
-        get() = _addedShoeDescription
+    val addedShoeDescription = MutableLiveData<String?>()
 
-    private val _addedShoeCompany = MutableLiveData<String?>()
-    val addedShoeCompany: LiveData<String?>
-        get() = _addedShoeCompany
+    val addedShoeCompany = MutableLiveData<String?>()
 
-    private val _addedShoeImgLink = MutableLiveData<String?>()
-    val addedShoeImgLink: LiveData<String?>
-        get() = _addedShoeImgLink
+    val addedShoeImgLink = MutableLiveData<String?>()
+
+    private val _shoeAdded = MutableLiveData<Boolean>()
+    val shoeAdded: LiveData<Boolean>
+        get() = _shoeAdded
+
+    private val _cancelClicked = MutableLiveData<Boolean>()
+    val cancelClicked: LiveData<Boolean>
+        get() = _cancelClicked
+
+    private val _formValidity = MutableLiveData<Boolean>()
+    val formValidity: LiveData<Boolean>
+        get() = _formValidity
 
     init {
+        _formValidity.value = true
+        _cancelClicked.value = false
+        _shoeAdded.value = false
         setShoesList()
     }
 
-    fun setShoesList() {
+    private fun setShoesList() {
         _shoesList.value = listOf(
             Shoe(
                 "Sport Shoes",
@@ -57,62 +57,64 @@ class ShoesViewModel : ViewModel() {
                 "Nike",
                 "Classic Comfortable Shoes",
                 listOf("https://m.media-amazon.com/images/I/51zDSpJ1ifL._AC_SY675_.jpg")
+            ),
+            Shoe(
+                "Classic Shoes",
+                40.0,
+                "Nike",
+                "Classic Comfortable Shoes",
+                listOf("https://m.media-amazon.com/images/I/51zDSpJ1ifL._AC_SY675_.jpg")
             )
 
         ).toMutableList()
     }
 
-    fun setShoeName(name: String) {
-        Timber.tag("name").i(name)
-        _addedShoeName.value = name
+    fun setBackShoeAdded(added: Boolean) {
+        _shoeAdded.value = added
     }
 
-    fun setShoeCompany(companyName: String) {
-        Timber.tag("companyName").i(companyName)
-
-        _addedShoeCompany.value = companyName
-
+    fun setBackCancel(cancelled: Boolean) {
+        _cancelClicked.value = cancelled
     }
-
-    fun setShoeSize(size: Double) {
-        Timber.tag("size").i(size.toString())
-        _addedShoeSize.value = size
-    }
-
-    fun setShoeDescription(description: String) {
-        Timber.tag("description").i(description)
-
-        _addedShoeDescription.value = description
-    }
-
-    fun setShoeImgLink(imgLink: String) {
-        Timber.tag("imgLink").i(imgLink)
-
-        _addedShoeImgLink.value = imgLink
-    }
-
     fun validateForm(): Boolean {
-        return !(_addedShoeName.value == null ||
-                _addedShoeDescription.value == null ||
-                _addedShoeCompany.value == null ||
-                _addedShoeSize.value == null ||
-                _addedShoeImgLink.value == null)
+        return !(addedShoeName.value == null ||
+                addedShoeDescription.value == null ||
+                addedShoeCompany.value == null ||
+                addedShoeSize.value == null ||
+                addedShoeImgLink.value == null)
+    }
+
+    fun cancel() {
+        _cancelClicked.value = true
     }
 
     fun addShoe() {
-        _addedShoe.value = Shoe(
-            _addedShoeName.value!!,
-            _addedShoeSize.value!!,
-            _addedShoeCompany.value!!,
-            _addedShoeDescription.value!!,
-            listOf(_addedShoeImgLink.value!!)
-        )
-        _shoesList.value?.add(_addedShoe.value!!)
-        _addedShoeName.value = null
-        _addedShoeCompany.value = null
-        _addedShoeSize.value = null
-        _addedShoeDescription.value = null
-        _addedShoeImgLink.value = null
+        if(validateForm()){
+            _formValidity.value = true
+            _addedShoe.value = Shoe(
+                addedShoeName.value!!,
+                addedShoeSize.value?.toDouble()!!,
+                addedShoeCompany.value!!,
+                addedShoeDescription.value!!,
+                listOf(addedShoeImgLink.value.toString())
+            )
+            _shoesList.value?.add(_addedShoe.value!!)
+            _shoeAdded.value = true
+            clear()
+        }else{
+            _formValidity.value = false
+        }
+
+
+    }
+
+    private fun clear() {
+        addedShoeName.value = null
+        addedShoeCompany.value = null
+        addedShoeSize.value = null
+        addedShoeDescription.value = null
+        addedShoeImgLink.value = null
+        _addedShoe.value = null
     }
 
 }
